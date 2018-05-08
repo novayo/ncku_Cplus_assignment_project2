@@ -44,9 +44,6 @@ private slots:
     void on_pause_clicked();
     void on_NewPuzzle_clicked();
     void on_Undo_clicked();
-
-    void on_actionGet_Hint_triggered();
-
 private:
     Ui::MainWindow *ui;
     int user_text_font;

@@ -9,6 +9,7 @@
 #include <QAbstractItemView>
 #include <ctime>
 
+
 #define UNASSIGNED 0
 #define N 9
 
@@ -69,6 +70,7 @@ void MainWindow::on_NewPuzzle_clicked()
     sudoku_start = false;
 
     solve = false;
+    ui->NewPuzzle->setText("New Puzzle");
 
     // default pause button
     pause = false;
@@ -160,6 +162,7 @@ void MainWindow::on_actionsetManually_triggered()
 {
     editing_mode = true;
     this->setWindowTitle("NCKU_Project_2 (Editing)");
+    ui->NewPuzzle->setText("Press to Start");
 
     for (int i=0; i<rowCount; ++i){
         for (int j=0; j<columnCount; ++j){
@@ -209,7 +212,7 @@ void MainWindow::on_actionCheck_triggered()
                 ui->resultLabel->setText("Bingo!");
                 ui->resultLabel->setVisible(true);
                 QPalette sample_palette;
-                sample_palette.setColor(QPalette::WindowText, Qt::green);
+                sample_palette.setColor(QPalette::WindowText, QColor(0,221,0));
 
                 ui->resultLabel->setAutoFillBackground(true);
                 ui->resultLabel->setPalette(sample_palette);
@@ -245,6 +248,8 @@ void MainWindow::on_actionReset_triggered()
         ui->pause->setEnabled(true);
         ui->Undo->setEnabled(true);
         ui->pause->setText("Pause");
+        ui->resultLabel->setVisible(false);
+        ui->can_be_solve_lable->setVisible(false);
         gammingPeriod = 0;
         while(undo_step >= 0){
             qDebug() <<  undo_step;
@@ -377,7 +382,7 @@ void MainWindow::on_actionSolve_triggered()
                 ui->resultLabel->setText(" Solved ");
                 ui->resultLabel->setVisible(true);
                 QPalette sample_palette;
-                sample_palette.setColor(QPalette::WindowText, Qt::green);
+                sample_palette.setColor(QPalette::WindowText, QColor(0,221,0));
 
                 ui->resultLabel->setAutoFillBackground(true);
                 ui->resultLabel->setPalette(sample_palette);
@@ -419,12 +424,6 @@ void MainWindow::on_actionSolve_triggered()
         ui->pause->setEnabled(false);
         ui->Undo->setEnabled(false);
     }
-}
-
-// Get hint
-void MainWindow::on_actionGet_Hint_triggered()
-{
-
 }
 
 // timer //
@@ -639,3 +638,4 @@ bool MainWindow::isSafe(int row, int col, int num)
 {
     return !UsedInRow(row,num) && !UsedInCol(col,num) && !UsedInBox(row - row%3 , col - col%3, num);
 }
+
