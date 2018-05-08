@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
+    <width>800</width>
     <height>636</height>
    </rect>
   </property>
@@ -1522,7 +1522,7 @@ color: rgb(0,159,204);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>769</width>
+     <width>800</width>
      <height>25</height>
     </rect>
    </property>
