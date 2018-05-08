@@ -978,7 +978,7 @@
    <widget class="QLabel" name="resultLabel">
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>590</x>
       <y>160</y>
       <width>191</width>
       <height>91</height>
@@ -994,6 +994,28 @@
     </property>
     <property name="text">
      <string>Bingo</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="can_be_solve_lable">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>10</y>
+      <width>681</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+      <underline>true</underline>
+     </font>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
     </property>
    </widget>
   </widget>

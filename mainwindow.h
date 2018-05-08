@@ -25,11 +25,11 @@ public:
     bool isCorrect();
     bool checkUnity(int arr[]);
     bool SolveSudoku();
-    bool FindUnassignedLocation();
-    bool UsedInRow(int rrow,int num);
-    bool UsedInCol(int ccol,int num);
+    bool FindUnassignedLocation(int &row, int &col);
+    bool UsedInRow(int row, int num);
+    bool UsedInCol(int col,int num);
     bool UsedInBox(int boxStartRow, int boxStartCol, int num);
-    bool isSafe(int num);
+    bool isSafe(int row, int col, int num);
     void set_random_sudoku();
 
     ~MainWindow();
@@ -45,12 +45,12 @@ private slots:
     void on_NewPuzzle_clicked();
     void on_Undo_clicked();
 
+    void on_actionGet_Hint_triggered();
+
 private:
     Ui::MainWindow *ui;
     int user_text_font;
     int question_text_font;
-    int row;
-    int col;
     int gammingPeriod;
     int undo_step;
     int ranrow;
@@ -58,6 +58,7 @@ private:
     bool pause;
     bool sudoku_start;
     bool undo;
+    bool solve;
     bool editing_mode;
     const int rowCount;
     const int columnCount;

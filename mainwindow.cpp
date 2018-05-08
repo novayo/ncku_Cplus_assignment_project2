@@ -14,7 +14,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), rowCount(9), columnCount(9), gammingPeriod(0), pause(true), sudoku_start(false), undo(false), editing_mode(false)
+    ui(new Ui::MainWindow),
+    rowCount(9), columnCount(9), gammingPeriod(0), pause(true), sudoku_start(false), undo(false), editing_mode(false),solve(false)
 {
     ui->setupUi(this);
 
@@ -48,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // set default
     ui->pause->setEnabled(false);
+    ui->Undo->setEnabled(false);
     ui->resultLabel->setVisible(false);
+    ui->can_be_solve_lable->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -56,156 +59,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// Finish button->setText(QString::number(user_sudoku[i][j]));
-void MainWindow::on_actionCheck_triggered()
-{
-    if (sudoku_start){
-        // get table widget value into vector
-        for (int i=0; i<rowCount; ++i){
-            for (int j=0; j<columnCount; ++j){
-                QString user_sudoku_value = ui->tableWidget->item(i, j)->text();
-                if (user_sudoku_value.toInt() > 0 && user_sudoku_value.toInt() < 10){
-                    user_sudoku[i][j] = user_sudoku_value.toInt();
-                }
-            }
-        }
-
-        if (isCorrect() == true){
-            ui->resultLabel->setText("Bingo");
-            ui->resultLabel->setVisible(true);
-            QPalette sample_palette;
-            sample_palette.setColor(QPalette::WindowText, Qt::green);
-
-            ui->resultLabel->setAutoFillBackground(true);
-            ui->resultLabel->setPalette(sample_palette);
-
-            qDebug() << "yeeeeeeeeeeeeeeeeeeeeeeeeeeeah!";
-        }
-        else{
-            ui->resultLabel->setText("Wrong");
-            ui->resultLabel->setVisible(true);
-            QPalette sample_palette;
-            sample_palette.setColor(QPalette::WindowText, Qt::red);
-
-            ui->resultLabel->setAutoFillBackground(true);
-            ui->resultLabel->setPalette(sample_palette);
-            qDebug() << "Wrongggggggggggggggggggggggggg!";
-        }
-    }
-}
-
-void MainWindow::on_actionsetManually_triggered()
-{
-    editing_mode = true;
-    this->setWindowTitle("NCKU_Project_2(Editing)");
-
-    for (int i=0; i<rowCount; ++i){
-        for (int j=0; j<columnCount; ++j){
-            // set text default
-            QFont fnt;
-            fnt.setPointSize(user_text_font);
-            ui->tableWidget->item(i, j)->setFont(fnt);
-            ui->tableWidget->item(i, j)->setText(QString(' '));
-            ui->tableWidget->item(i, j)->setBackgroundColor(QColor(255,255,255));
-
-            // set item editable
-            Qt::ItemFlags eFlags = ui->tableWidget->item(i, j)->flags();
-            eFlags |= Qt::ItemIsEditable;
-            ui->tableWidget->item(i, j)->setFlags(eFlags);
-
-            // set timer invisible
-            ui->Clock->setVisible(false);
-
-            // set pause button inenable
-            ui->pause->setEnabled(false);
-        }
-    }
-}
-
-void MainWindow::on_actionSolve_triggered()
-{
-    bool check_sudoku_is_zero = false;
-    for (int i=0; i<rowCount; ++i){
-        for (int j=0; j<columnCount; ++j){
-            user_sudoku[i][j] = ui->tableWidget->item(i, j)->text().toInt();
-            if (user_sudoku[i][j] == 0)
-                check_sudoku_is_zero = true;
-        }
-    }
-
-    if (check_sudoku_is_zero == true){
-        if(SolveSudoku()){
-            for (int i=0; i<rowCount; ++i){
-                for (int j=0; j<columnCount; ++j){
-                    ui->tableWidget->item(i, j)->setText(QString::number(user_sudoku[i][j]));
-                }
-            }
-           /// // print solvable // ///
-            qDebug() << "solvable";
-        }
-        else{
-            ///  // print unsolvable // ///
-            qDebug() << "unsolvable";
-        }
-    }
-    else if (isCorrect()==false && check_sudoku_is_zero==false){
-        ///  // print sudoku table can't be solved ! // ///
-        qDebug() << "sudoku table can't be solved !";
-    }
-    else{
-        ///  // print sudoku table is solved ! // ///
-        qDebug() << "sudoku table is already solved !";
-    }
-}
-
-void MainWindow::on_actionReset_triggered()
-{
-    if (sudoku_start){
-        pause = false;
-        ui->pause->setText("pause");
-        gammingPeriod = 0;
-        while(undo_step >= 0){
-            qDebug() <<  undo_step;
-            if (ui->tableWidget->item(undo_row[undo_step], undo_column[undo_step])->backgroundColor() == QColor(255, 255, 255)){
-                ui->tableWidget->item(undo_row[undo_step], undo_column[undo_step])->setText(QString(' '));
-            }
-            undo_column[undo_step] = 0;
-            undo_row[undo_step] = 0;
-            undo_value[undo_step] = 0;
-            undo_step--;
-        }
-        if (undo_step < 0){
-            undo_step = 0;
-        }
-    }
-}
-
-void MainWindow::showTime(){
-    QTime zeroTime(0, 0, 0);
-    QTime display;
-    display = zeroTime.addSecs(gammingPeriod);
-
-    QString time_text = display.toString("hh : mm : ss");
-
-    ui->Clock->setText(time_text);
-    if(!pause){
-        ++gammingPeriod;
-    }
-}
-
-// start new game //
+// Random sudoku //
 void MainWindow::on_NewPuzzle_clicked()
 {
-    this->setWindowTitle("NCKU_Project_2(Gamming)");
+    this->setWindowTitle("NCKU_Project_2 (Gamming)");
     srand(time(NULL));
     /***** set default *****/
     // default sudoku_start
     sudoku_start = false;
 
+    solve = false;
+
     // default pause button
     pause = false;
     ui->pause->setText("Pause");
     ui->pause->setEnabled(true);
+    ui->Undo->setEnabled(true);
 
     // default timer time
     gammingPeriod = 0;
@@ -217,6 +86,7 @@ void MainWindow::on_NewPuzzle_clicked()
     for (int i=0; i<rowCount; ++i){
         for (int j=0; j<columnCount; ++j){
             ui->tableWidget->item(i, j)->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget->item(i, j)->setTextColor(Qt::black);
             ui->tableWidget->item(i, j)->setFont(fnt);
             ui->tableWidget->item(i, j)->setBackgroundColor(QColor(255, 255, 255));
             Qt::ItemFlags eFlags = ui->tableWidget->item(i, j)->flags();
@@ -224,40 +94,23 @@ void MainWindow::on_NewPuzzle_clicked()
             ui->tableWidget->item(i, j)->setFlags(eFlags);
         }
     }
-/*
+
     // default sudoku table
-    int s[9][9] = {0,0,4,0,3,0,0,0,0,   // difficult
-                   0,0,5,0,0,1,0,7,0,
-                   0,9,0,0,0,0,0,0,6,
-                   0,1,0,0,0,0,0,0,3,
-                   3,0,0,0,0,7,0,0,1,
-                   2,0,0,5,0,0,0,6,0,
-                   7,0,0,0,0,0,0,8,0,
-                   0,5,0,6,0,0,7,0,0,
-                   0,0,0,0,8,0,4,0,0
-                  };
-    int s1[9][9] = {3,0,0,0,0,1,0,2,4,  // mid
-                    0,5,0,3,0,0,0,0,1,
-                    0,1,0,0,0,8,0,7,0,
-                    0,7,0,4,0,5,0,0,8,
-                    0,0,3,2,0,0,9,0,0,
-                    6,0,0,0,3,0,0,4,0,
-                    0,8,0,9,0,0,0,6,0,
-                    4,0,0,0,0,2,0,8,0,
-                    7,9,0,8,0,0,0,0,2
-                   };
-    int s2[9][9] = {0,7,9,0,3,4,1,0,6,  // easy
-                    4,0,0,0,0,5,0,9,0,
-                    0,5,0,0,9,0,0,0,7,
-                    0,0,5,9,0,1,0,4,0,
-                    7,6,0,0,0,8,0,3,5,
-                    0,2,0,6,0,0,7,0,0,
-                    6,0,0,0,1,0,0,8,0,
-                    0,4,0,5,0,0,0,0,9,
-                    5,0,2,4,6,0,3,7,0
-                   };*/
     int question[9][9];
-    int choice = rand()%3;
+
+    if (editing_mode == true){
+        int n_zero = 0;
+        for (int i=0; i<rowCount; ++i){
+            for (int j=0; j<columnCount; ++j){
+                if (user_sudoku[i][j] = ui->tableWidget->item(i, j)->text().toInt() == 0){
+                    ++n_zero;
+                }
+            }
+        }
+        if (n_zero == 81){
+            editing_mode = false;
+        }
+    }
 
     if (editing_mode == true){
         // get value from table
@@ -275,36 +128,9 @@ void MainWindow::on_NewPuzzle_clicked()
                 question[i][j] = user_sudoku[i][j];
             }
         }
-        /*
-        switch (choice) {
-        case 0:
-            for (int i=0; i<rowCount; ++i){
-                for (int j=0; j<columnCount; ++j){
-                    question[i][j] = s[i][j];
-                }
-            }
-            break;
-        case 1:
-            for (int i=0; i<rowCount; ++i){
-                for (int j=0; j<columnCount; ++j){
-                    question[i][j] = s1[i][j];
-                }
-            }
-            break;
-        case 2:
-            for (int i=0; i<rowCount; ++i){
-                for (int j=0; j<columnCount; ++j){
-                    question[i][j] = s2[i][j];
-                }
-            }
-            break;
-        default:
-            break;
-        }
-        */
     }
 
-    //
+    // set question to table
     for (int i=0; i<rowCount; ++i){
         for (int j=0; j<columnCount; ++j){
             if (question[i][j] == 0){
@@ -329,52 +155,115 @@ void MainWindow::on_NewPuzzle_clicked()
     editing_mode = false;
 }
 
-void MainWindow::set_random_sudoku()
+// Manual sudoku
+void MainWindow::on_actionsetManually_triggered()
 {
-    int rando;
-    while(true){
-        for(int i=0; i<9; ++i){
-            for(int j=0; j<9; ++j){
-                user_sudoku[i][j]=0;
-            }
-        }
-        for(int i =0;i<=8;i++){
-            rando=rand()%9;
-            rando+=1;
-            user_sudoku[i][i]=rando;
-            qDebug("%d",rando);
-        }
-        for(int i =0;i<=45;i++){
-            ranrow=rand()%9;
-            rancol=rand()%9;
-            rando=rand()%9;
-            rando+=1;
-            if(isSafe(ranrow)){
-                user_sudoku[ranrow][rancol]=rando;
-            }
-        }
+    editing_mode = true;
+    this->setWindowTitle("NCKU_Project_2 (Editing)");
 
-        if(SolveSudoku()){
-            for(int i =0;i<=50;i++){
-                int ranrow=rand()%9;
-                int randcol=rand()%9;
-                rando=rand()%9;
-                rando+=1;
-                user_sudoku[ranrow][randcol]=0;
-            }
-            for(int i=0; i<9; ++i){
-                for(int j=0; j<9; ++j){
-                    ui->tableWidget->item(i,j)->setText(QString::number(user_sudoku[i][j]));
-                }
-            }
-            return;
-        }
-        else{
-            continue;
+    for (int i=0; i<rowCount; ++i){
+        for (int j=0; j<columnCount; ++j){
+            // set text default
+            QFont fnt;
+            fnt.setPointSize(user_text_font);
+            ui->tableWidget->item(i, j)->setFont(fnt);
+            ui->tableWidget->item(i, j)->setTextColor(Qt::black);
+            ui->tableWidget->item(i, j)->setText(QString(' '));
+            ui->tableWidget->item(i, j)->setBackgroundColor(QColor(255,255,255));
+
+            // set item editable
+            Qt::ItemFlags eFlags = ui->tableWidget->item(i, j)->flags();
+            eFlags |= Qt::ItemIsEditable;
+            ui->tableWidget->item(i, j)->setFlags(eFlags);
+
+            // set timer invisible
+            ui->Clock->setVisible(false);
+
+            // set pause button inenable
+            ui->pause->setEnabled(false);
+            ui->Undo->setEnabled(false);
         }
     }
 }
 
+// Finish button //
+void MainWindow::on_actionCheck_triggered()
+{
+    if (sudoku_start && !solve){
+        // get table widget value into vector
+        bool is_zero = false;
+        for (int i=0; i<rowCount; ++i){
+            for (int j=0; j<columnCount; ++j){
+                QString user_sudoku_value = ui->tableWidget->item(i, j)->text();
+                if (user_sudoku_value.toInt() > 0 && user_sudoku_value.toInt() < 10){
+                    user_sudoku[i][j] = user_sudoku_value.toInt();
+                }
+                else{
+                    is_zero = true;
+                }
+            }
+        }
+
+        if (is_zero == false){
+            if (isCorrect() == true){
+                ui->resultLabel->setText("Bingo!");
+                ui->resultLabel->setVisible(true);
+                QPalette sample_palette;
+                sample_palette.setColor(QPalette::WindowText, Qt::green);
+
+                ui->resultLabel->setAutoFillBackground(true);
+                ui->resultLabel->setPalette(sample_palette);
+            }
+            else{
+                ui->resultLabel->setText("Wrong!");
+                ui->resultLabel->setVisible(true);
+                QPalette sample_palette;
+                sample_palette.setColor(QPalette::WindowText, Qt::red);
+
+                ui->resultLabel->setAutoFillBackground(true);
+                ui->resultLabel->setPalette(sample_palette);
+            }
+        }
+        else{
+            ui->resultLabel->setText("Wrong!");
+            ui->resultLabel->setVisible(true);
+            QPalette sample_palette;
+            sample_palette.setColor(QPalette::WindowText, Qt::red);
+
+            ui->resultLabel->setAutoFillBackground(true);
+            ui->resultLabel->setPalette(sample_palette);
+        }
+    }
+}
+
+
+// Reset button //
+void MainWindow::on_actionReset_triggered()
+{
+    if (sudoku_start){
+        pause = false;
+        ui->pause->setEnabled(true);
+        ui->Undo->setEnabled(true);
+        ui->pause->setText("Pause");
+        gammingPeriod = 0;
+        while(undo_step >= 0){
+            qDebug() <<  undo_step;
+            if (ui->tableWidget->item(undo_row[undo_step], undo_column[undo_step])->backgroundColor() == QColor(255, 255, 255)){
+                ui->tableWidget->item(undo_row[undo_step], undo_column[undo_step])->setText(QString(' '));
+            }
+            undo_column[undo_step] = 0;
+            undo_row[undo_step] = 0;
+            undo_value[undo_step] = 0;
+            undo_step--;
+        }
+        if (undo_step < 0){
+            undo_step = 0;
+        }
+        solve = false;
+    }
+}
+
+// Pause button //
 void MainWindow::on_pause_clicked()
 {
     pause = !pause;
@@ -404,19 +293,21 @@ void MainWindow::on_pause_clicked()
     }
 }
 
-// set undo
+// Undo button //
 void MainWindow::on_tableWidget_cellChanged(int row, int column)
 {
     ui->resultLabel->setVisible(false);
+    ui->can_be_solve_lable->setVisible(false);
     string str = ui->tableWidget->item(row, column)->text().toStdString();
     char c = str[0] - 48;
+    char c1 = str[1] - 48;
 
-    if (!editing_mode){
-        if (sudoku_start && ((int(c) > 10) || ui->tableWidget->item(row, column)->text().toInt() > 10)){
+    if (sudoku_start && !editing_mode){
+        if (((int(c) > 10) || (int(c1) > -48) || ui->tableWidget->item(row, column)->text().toInt() > 10)){
             ui->tableWidget->item(row, column)->setText(QString(' '));
             --undo_step;
         }else{
-            if (sudoku_start && !undo){
+            if (!undo){
                 undo_value[undo_step] = ui->tableWidget->item(row, column)->text().toInt();
                 undo_row[undo_step] = row;
                 undo_column[undo_step] = column;
@@ -428,7 +319,6 @@ void MainWindow::on_tableWidget_cellChanged(int row, int column)
         }
     }
 }
-
 void MainWindow::on_Undo_clicked()
 {
     undo = true;
@@ -454,8 +344,102 @@ void MainWindow::on_Undo_clicked()
     }
 }
 
+// Solve button //
+void MainWindow::on_actionSolve_triggered()
+{
+    if (sudoku_start){
+        bool check_sudoku_is_zero = false;
+        for (int i=0; i<rowCount; ++i){
+            for (int j=0; j<columnCount; ++j){
+                user_sudoku[i][j] = ui->tableWidget->item(i, j)->text().toInt();
+                if (user_sudoku[i][j] == 0)
+                    check_sudoku_is_zero = true;
+                if(ui->tableWidget->item(i, j)->backgroundColor() == QColor(255, 255, 255)){
+                       user_sudoku[i][j] = 0;
+                }
+            }
+        }
 
+        if (check_sudoku_is_zero == true){
+            if(SolveSudoku()){
+                for (int i=0; i<rowCount; ++i){
+                    for (int j=0; j<columnCount; ++j){
+                        if(ui->tableWidget->item(i, j)->backgroundColor() == QColor(255, 255, 255)){
+                            ui->tableWidget->item(i, j)->setTextColor(Qt::red);
+                            Qt::ItemFlags eFlags = ui->tableWidget->item(i, j)->flags();
+                            eFlags &= ~Qt::ItemIsEditable;
+                            ui->tableWidget->item(i, j)->setFlags(eFlags);
+                            ui->tableWidget->item(i, j)->setText(QString::number(user_sudoku[i][j]));
+                        }
+                    }
+                }
+               /// // print solvable // ///
+                ui->resultLabel->setText(" Solved ");
+                ui->resultLabel->setVisible(true);
+                QPalette sample_palette;
+                sample_palette.setColor(QPalette::WindowText, Qt::green);
 
+                ui->resultLabel->setAutoFillBackground(true);
+                ui->resultLabel->setPalette(sample_palette);
+
+                solve = true;
+            }
+            else{
+                ///  // print unsolvable // ///
+                ui->resultLabel->setText("Unsolved");
+                ui->resultLabel->setVisible(true);
+                QPalette sample_palette;
+                sample_palette.setColor(QPalette::WindowText, Qt::red);
+
+                ui->resultLabel->setAutoFillBackground(true);
+                ui->resultLabel->setPalette(sample_palette);
+            }
+        }
+        else if (isCorrect()==false && check_sudoku_is_zero==false){
+            ///  // print sudoku table can't be solved ! // ///
+            ui->can_be_solve_lable->setText("Sudoku table can't be solved !");
+            ui->can_be_solve_lable->setVisible(true);
+            QPalette sample_palette;
+            sample_palette.setColor(QPalette::WindowText, QColor(255,0,255));
+
+            ui->can_be_solve_lable->setAutoFillBackground(true);
+            ui->can_be_solve_lable->setPalette(sample_palette);
+        }
+        else{
+            ///  // print sudoku table is solved ! // ///
+            ui->can_be_solve_lable->setText("Sudoku table is already solved !");
+            ui->can_be_solve_lable->setVisible(true);
+            QPalette sample_palette;
+            sample_palette.setColor(QPalette::WindowText, QColor(255,0,255));
+
+            ui->can_be_solve_lable->setAutoFillBackground(true);
+            ui->can_be_solve_lable->setPalette(sample_palette);
+        }
+        pause = true;
+        ui->pause->setEnabled(false);
+        ui->Undo->setEnabled(false);
+    }
+}
+
+// Get hint
+void MainWindow::on_actionGet_Hint_triggered()
+{
+
+}
+
+// timer //
+void MainWindow::showTime(){
+    QTime zeroTime(0, 0, 0);
+    QTime display;
+    display = zeroTime.addSecs(gammingPeriod);
+
+    QString time_text = display.toString("hh : mm : ss");
+
+    ui->Clock->setText(time_text);
+    if(!pause){
+        ++gammingPeriod;
+    }
+}
 
 
 
@@ -536,76 +520,122 @@ bool MainWindow::checkUnity(int arr[])
     for(int i=0; i<9; ++i)
         ++arr_unity[arr[i]-1]; // count
     for(int i=0; i<9; ++i)
-        if(arr_unity[i] != 1) // all element
+        if(arr_unity[i] > 1) // all element
             return false; // must be 1
     return true;
 }
 
-bool MainWindow::SolveSudoku()
+void MainWindow::set_random_sudoku()
 {
-    if (!FindUnassignedLocation())
-       return true;
+    int rando;
+    while(true){
+        for(int i=0; i<9; ++i){
+            for(int j=0; j<9; ++j){
+                user_sudoku[i][j]=0;
+            }
+        }
+        for(int i =0;i<=8;i++){
+            rando=rand()%9;
+            rando+=1;
+            user_sudoku[i][i]=rando;
 
-    for (int num = 1; num <= 9; num++)
-    {
-        if (isSafe(num))
-        {
-            user_sudoku[row][col] = num;
+        }
+        for(int i =0;i<=45;i++){
+            ranrow=rand()%9;
+            rancol=rand()%9;
+            rando=rand()%9;
+            rando+=1;
+            if(isSafe(ranrow, rancol, rando)){
+                user_sudoku[ranrow][rancol]=rando;
+            }
+        }
 
-            if (SolveSudoku())
-                return true;
-
-            user_sudoku[row][col] = UNASSIGNED;
+        if(SolveSudoku()){
+            for(int i =0;i<=50;i++){
+                int ranrow=rand()%9;
+                int randcol=rand()%9;
+                rando=rand()%9;
+                rando+=1;
+                user_sudoku[ranrow][randcol]=0;
+            }
+            for(int i=0; i<9; ++i){
+                for(int j=0; j<9; ++j){
+                    ui->tableWidget->item(i,j)->setText(QString::number(user_sudoku[i][j]));
+                }
+            }
+            return;
+        }
+        else{
+            continue;
         }
     }
-    return false;
 }
 
-bool MainWindow::FindUnassignedLocation()
+bool MainWindow::SolveSudoku()
+{
+    if(isCorrect()){
+        int row, col, i=0;
+        if (!FindUnassignedLocation(row, col))
+           return true;
+
+        for (int num = 1; num <= 9; num++)
+        {
+            if (isSafe(row, col, num))
+            {
+                user_sudoku[row][col] = num;
+
+                if (SolveSudoku())
+                    return true;
+
+                user_sudoku[row][col] = UNASSIGNED;
+            }
+            else{
+                //qDebug() << i++;
+            }
+        }
+        return false;
+    }
+    else{
+        return false;
+    }
+
+}
+
+bool MainWindow::FindUnassignedLocation(int &row, int &col)
 {
     for (row = 0; row < N; row++)
-        for (col = 0; col < N; col++)
-            if (user_sudoku[row][col] == UNASSIGNED)
+            for (col = 0; col < N; col++)
+                if (user_sudoku[row][col] == UNASSIGNED)
+                    return true;
+        return false;
+}
+
+bool MainWindow::UsedInRow(int row, int num)
+{
+    for (int col = 0; col < N; col++)
+            if (user_sudoku[row][col] == num)
                 return true;
     return false;
 }
 
-bool MainWindow::UsedInRow(int rrow, int num)
+bool MainWindow::UsedInCol(int col, int num)
 {
-    for (int ccol = 0; ccol < N; ccol++)
-        if (user_sudoku[rrow][ccol] == num)
-            return true;
-    return false;
-}
-
-bool MainWindow::UsedInCol(int ccol, int num)
-{
-    for (int rrow = 0; rrow < N; rrow++)
-        if (user_sudoku[rrow][ccol] == num)
-            return true;
+    for (int row = 0; row < N; row++)
+            if (user_sudoku[row][col] == num)
+                return true;
     return false;
 }
 
 bool MainWindow::UsedInBox(int boxStartRow, int boxStartCol, int num)
 {
     for (int row = 0; row < 3; row++)
-        for (int col = 0; col < 3; col++)
-            if (user_sudoku[row+boxStartRow][col+boxStartCol] == num)
-                return true;
+            for (int col = 0; col < 3; col++)
+                if (user_sudoku[row+boxStartRow][col+boxStartCol] == num)
+                    return true;
     return false;
 }
 
-bool MainWindow::isSafe(int num)
+bool MainWindow::isSafe(int row, int col, int num)
 {
     return !UsedInRow(row,num) && !UsedInCol(col,num) && !UsedInBox(row - row%3 , col - col%3, num);
 }
-
-
-
-
-
-
-
-
-
-
