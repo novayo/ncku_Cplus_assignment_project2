@@ -8,6 +8,9 @@
 #include <QTimer>
 #include <QDateTime>
 #include <string>
+#include <QKeyEvent>
+#include "aboutdialog.h"
+#include "begindialog.h"
 
 using namespace std;
 
@@ -31,6 +34,7 @@ public:
     bool UsedInBox(int boxStartRow, int boxStartCol, int num);
     bool isSafe(int row, int col, int num);
     void set_random_sudoku();
+    void keyPressEvent(QKeyEvent *event);
 
     ~MainWindow();
 
@@ -44,6 +48,9 @@ private slots:
     void on_pause_clicked();
     void on_NewPuzzle_clicked();
     void on_Undo_clicked();
+    void on_actionGet_Hint_triggered();
+    void on_actionAbout_triggered();
+
 private:
     Ui::MainWindow *ui;
     int user_text_font;
@@ -52,20 +59,27 @@ private:
     int undo_step;
     int ranrow;
     int rancol;
+    int difficulty;
+    int give_hint_times;
     bool pause;
     bool sudoku_start;
     bool undo;
     bool solve;
     bool editing_mode;
+    bool finish_status;
     const int rowCount;
     const int columnCount;
     vector<int> user_sudoku_row;
     vector< vector<int> > user_sudoku;
+    vector<int> ans_sudoku_row;
+    vector< vector<int> > ans_sudoku;
     vector<int> undo_value;
     vector<int> undo_row;
     vector<int> undo_column;
     QTime ctime;
     QTimer *timer;
+    AboutDialog *aboutdialog;
+    BeginDialog *begindialog;
 };
 
 #endif // MAINWINDOW_H

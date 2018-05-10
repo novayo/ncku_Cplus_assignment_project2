@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AboutDialog</class>
+ <widget class="QDialog" name="AboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>409</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>說明</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/Resources/img/myGrade.png</normaloff>:/Resources/img/myGrade.png</iconset>
+  </property>
+  <widget class="QPushButton" name="About_cancel">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>360</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>40</y>
+     <width>411</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>程式設計(二) - 專題二：
+    參考網址：https://slides.com/hmkrl/deck-9#/
+
+設計心得：
+    一開始碰到Qt時，我完全不知道要如何下手，當下那種
+束手無策的感覺，到現在還是記憶猶新，直到開始去看
+youtube的教學影片的時候，才漸漸抓住寫Qt的感覺，
+還記得一開始能跳出一個視窗，我心情就能好上一整天呢！
+而到現在已經能寫出了一個可以玩的互動式界面，
+才正式的讓意識到原來code不僅僅是在螢幕上顯示的文字，
+而是真正的能有無限的可能性，我真心的覺得能上這堂課
+真的很棒，能夠學到東西，而且從零到有的感覺真很棒，
+在這裡謝謝老師以及助教 !!</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>-30</x>
+     <y>40</y>
+     <width>191</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="resources.qrc">:/Resources/img/supass_100.jpeg</pixmap>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>About_cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>AboutDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>498</x>
+     <y>373</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

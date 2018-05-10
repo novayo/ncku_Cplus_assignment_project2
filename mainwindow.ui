@@ -1467,7 +1467,7 @@ color: rgb(0,159,204);
 }</string>
        </property>
        <property name="text">
-        <string>New Puzzle</string>
+        <string>Press to Start</string>
        </property>
       </widget>
      </item>
@@ -1546,10 +1546,18 @@ color: rgb(0,159,204);
     <property name="title">
      <string>Hint</string>
     </property>
+    <addaction name="actionGet_Hint"/>
     <addaction name="actionSolve"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuUser"/>
    <addaction name="menuHint"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionCheck">
    <property name="text">
@@ -1574,6 +1582,16 @@ color: rgb(0,159,204);
   <action name="actionReset">
    <property name="text">
     <string>Reset</string>
+   </property>
+  </action>
+  <action name="actionGet_Hint">
+   <property name="text">
+    <string>Get Hint</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

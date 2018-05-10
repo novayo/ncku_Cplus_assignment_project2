@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/Resources">
         <file>img/myGrade.png</file>
+        <file>img/supass_100.jpeg</file>
     </qresource>
 </RCC>
